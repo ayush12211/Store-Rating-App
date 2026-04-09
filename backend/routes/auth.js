@@ -16,8 +16,8 @@ router.post(
   "/signup",
   [
     body("name")
-      .isLength({ min: 5, max: 60 })
-      .withMessage("Name must be 5-60 characters"),
+      .isLength({ min: 20, max: 60 })
+      .withMessage("Name must be 20-60 characters"),
     body("email").isEmail().withMessage("Invalid email"),
     body("address")
       .isLength({ max: 400 })

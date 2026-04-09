@@ -1,7 +1,7 @@
 export const validators = {
   name: (val) => {
     if (!val) return "Name is required";
-    if (val.length < 5) return "Name must be at least 5 characters";
+    if (val.length < 20) return "Name must be at least 20 characters";
     if (val.length > 60) return "Name must be at most 60 characters";
     return null;
   },

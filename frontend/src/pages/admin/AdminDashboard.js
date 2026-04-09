@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { adminAPI } from "../../api";
 import { StatCard, Card, toast } from "../../components/common";
 
 export default function AdminDashboard() {
+  const navigate = useNavigate();
   const [stats, setStats] = useState(null);
   const [loading, setLoading] = useState(true);
 
@@ -74,25 +76,26 @@ export default function AdminDashboard() {
           {
             icon: "➕",
             title: "Add New User",
-            desc: "Create admin, user, or store owner accounts",
-            href: "#add-user",
+            desc: "Create admin and normal user accounts",
+            path: "/admin/users",
           },
           {
             icon: "🏪",
             title: "Manage Stores",
             desc: "Add and view all registered stores",
-            href: "#stores",
+            path: "/admin/stores",
           },
           {
             icon: "📊",
             title: "View All Users",
             desc: "Browse, filter and inspect user details",
-            href: "#users",
+            path: "/admin/users",
           },
         ].map((item) => (
           <Card
             key={item.title}
             style={{ cursor: "pointer", transition: "border-color 0.2s" }}
+            onClick={() => navigate(item.path)}
             onMouseEnter={(e) =>
               (e.currentTarget.style.borderColor = "var(--accent)")
             }

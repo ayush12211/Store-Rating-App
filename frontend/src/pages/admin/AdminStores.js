@@ -4,9 +4,9 @@ import {
   Table,
   Button,
   Input,
+  Select,
   Modal,
   Card,
-  StarRating,
   toast,
 } from "../../components/common";
 import { validateForm } from "../../utils/validators";
@@ -23,6 +23,8 @@ export default function AdminStores() {
   const [form, setForm] = useState(initialForm);
   const [formErrors, setFormErrors] = useState({});
   const [saving, setSaving] = useState(false);
+  const [storeOwners, setStoreOwners] = useState([]);
+  const [loadingOwners, setLoadingOwners] = useState(false);
 
   const fetchStores = useCallback(() => {
     setLoading(true);
@@ -36,6 +38,16 @@ export default function AdminStores() {
   useEffect(() => {
     fetchStores();
   }, [fetchStores]);
+
+  useEffect(() => {
+    if (!addModal) return;
+    setLoadingOwners(true);
+    adminAPI
+      .getUsers({ role: "store_owner", sortBy: "name", sortOrder: "ASC" })
+      .then((res) => setStoreOwners(res.data || []))
+      .catch(() => toast.error("Failed to load store owners"))
+      .finally(() => setLoadingOwners(false));
+  }, [addModal]);
 
   const handleSort = (field) => {
     if (sortBy === field) setSortOrder((o) => (o === "ASC" ? "DESC" : "ASC"));
@@ -66,9 +78,19 @@ export default function AdminStores() {
       toast.success("Store created successfully!");
       setAddModal(false);
       setForm(initialForm);
+      setFormErrors({});
       fetchStores();
     } catch (err) {
-      toast.error(err.response?.data?.message || "Failed to create store");
+      const serverErrors = err.response?.data?.errors;
+      if (Array.isArray(serverErrors) && serverErrors.length) {
+        const mapped = {};
+        serverErrors.forEach((e) => {
+          mapped[e.path || e.param] = e.msg;
+        });
+        setFormErrors(mapped);
+      } else {
+        toast.error(err.response?.data?.message || "Failed to create store");
+      }
     } finally {
       setSaving(false);
     }
@@ -236,13 +258,25 @@ export default function AdminStores() {
             onChange={handleFormChange}
             error={formErrors.address}
           />
-          <Input
-            label="Owner ID (optional)"
+          <Select
+            label="Store Owner (optional)"
             name="ownerId"
-            placeholder="User ID of store owner"
             value={form.ownerId}
             onChange={handleFormChange}
-          />
+            error={formErrors.ownerId}
+          >
+            <option value="">No owner assigned</option>
+            {storeOwners.map((owner) => (
+              <option key={owner.id} value={owner.id}>
+                {owner.name} ({owner.email}) - ID {owner.id}
+              </option>
+            ))}
+          </Select>
+          {loadingOwners && (
+            <span style={{ color: "var(--text3)", fontSize: 12 }}>
+              Loading store owners...
+            </span>
+          )}
           <div style={{ display: "flex", gap: 10, marginTop: 8 }}>
             <Button type="submit" loading={saving} style={{ flex: 1 }}>
               Create Store

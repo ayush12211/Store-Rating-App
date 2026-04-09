@@ -7,14 +7,10 @@ import {
   Select,
   Modal,
   Card,
-  Badge,
   RoleBadge,
-  StatCard,
   toast,
 } from "../../components/common";
 import { validateForm } from "../../utils/validators";
-
-const ROLE_OPTIONS = ["", "admin", "user", "store_owner"];
 
 const initialForm = {
   name: "",
@@ -175,7 +171,7 @@ export default function AdminUsers() {
             Users
           </h1>
           <p style={{ color: "var(--text3)", marginTop: 4, fontSize: 13 }}>
-            {users.length} users found
+            {users.length} admin/normal users found
           </p>
         </div>
         <Button onClick={() => setAddModal(true)}>➕ Add User</Button>
@@ -216,7 +212,6 @@ export default function AdminUsers() {
             <option value="">All Roles</option>
             <option value="admin">Admin</option>
             <option value="user">User</option>
-            <option value="store_owner">Store Owner</option>
           </Select>
           <Button
             variant="ghost"

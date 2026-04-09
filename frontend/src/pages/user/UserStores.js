@@ -75,28 +75,37 @@ function StoreCard({ store, onRated }) {
             <p style={{ color: "var(--text3)", fontSize: 13 }}>
               {store.address}
             </p>
+            <p style={{ color: "var(--text3)", fontSize: 12, marginTop: 6 }}>
+              Overall Rating:{" "}
+              {store.avgRating ? (
+                <span style={{ color: "var(--accent)", fontWeight: 600 }}>
+                  {store.avgRating} / 5
+                </span>
+              ) : (
+                "No ratings yet"
+              )}
+            </p>
           </div>
-          {store.avgRating && (
-            <div
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: 4,
+              flexShrink: 0,
+              opacity: store.avgRating ? 1 : 0.5,
+            }}
+          >
+            <span style={{ color: "var(--accent)", fontSize: 18 }}>★</span>
+            <span
               style={{
-                display: "flex",
-                alignItems: "center",
-                gap: 4,
-                flexShrink: 0,
+                fontFamily: "var(--font-display)",
+                fontWeight: 700,
+                fontSize: 16,
               }}
             >
-              <span style={{ color: "var(--accent)", fontSize: 18 }}>★</span>
-              <span
-                style={{
-                  fontFamily: "var(--font-display)",
-                  fontWeight: 700,
-                  fontSize: 16,
-                }}
-              >
-                {store.avgRating}
-              </span>
-            </div>
-          )}
+              {store.avgRating || "—"}
+            </span>
+          </div>
         </div>
 
         <div

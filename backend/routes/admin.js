@@ -11,7 +11,7 @@ const adminOnly = [authenticate, authorize('admin')];
 router.get('/dashboard', ...adminOnly, async (req, res) => {
   try {
     const [totalUsers, totalStores, totalRatings] = await Promise.all([
-      User.count({ where: { role: { [Op.ne]: 'admin' } } }),
+      User.count(),
       Store.count(),
       Rating.count(),
     ]);
@@ -25,7 +25,7 @@ router.get('/dashboard', ...adminOnly, async (req, res) => {
 router.get('/users', ...adminOnly, async (req, res) => {
   try {
     const { name, email, address, role, sortBy = 'name', sortOrder = 'ASC' } = req.query;
-    const where = {};
+    const where = { role: { [Op.in]: ['admin', 'user'] } };
     if (name) where.name = { [Op.iLike]: `%${name}%` };
     if (email) where.email = { [Op.iLike]: `%${email}%` };
     if (address) where.address = { [Op.iLike]: `%${address}%` };
@@ -69,7 +69,7 @@ router.get('/users/:id', ...adminOnly, async (req, res) => {
 
 // POST /api/admin/users
 router.post('/users', ...adminOnly, [
-  body('name').isLength({ min: 5, max: 60 }).withMessage('Name must be 5-60 characters'),
+  body('name').isLength({ min: 20, max: 60 }).withMessage('Name must be 20-60 characters'),
   body('email').isEmail().withMessage('Invalid email'),
   body('address').isLength({ max: 400 }).withMessage('Address max 400 characters'),
   body('password')
@@ -129,13 +129,35 @@ router.post('/stores', ...adminOnly, [
   body('name').isLength({ min: 20, max: 60 }).withMessage('Name must be 20-60 characters'),
   body('email').isEmail().withMessage('Invalid email'),
   body('address').isLength({ max: 400 }).withMessage('Address max 400 characters'),
+  body('ownerId')
+    .optional({ values: 'falsy' })
+    .isInt({ min: 1 })
+    .withMessage('Owner ID must be a valid user ID'),
 ], async (req, res) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) return res.status(400).json({ errors: errors.array() });
 
   try {
     const { name, email, address, ownerId } = req.body;
-    const store = await Store.create({ name, email, address, ownerId: ownerId || null });
+    let normalizedOwnerId = null;
+    if (ownerId !== undefined && ownerId !== null && ownerId !== '') {
+      normalizedOwnerId = Number(ownerId);
+      const owner = await User.findOne({
+        where: { id: normalizedOwnerId, role: 'store_owner' },
+      });
+      if (!owner) {
+        return res.status(400).json({
+          message: 'Selected owner is invalid. Please choose a valid Store Owner user.',
+        });
+      }
+    }
+
+    const store = await Store.create({
+      name,
+      email,
+      address,
+      ownerId: normalizedOwnerId,
+    });
     res.status(201).json(store);
   } catch (err) {
     res.status(500).json({ message: err.message });

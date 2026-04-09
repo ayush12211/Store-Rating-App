@@ -124,7 +124,7 @@ export default function SignupPage() {
             <Input
               label="Full Name"
               name="name"
-              placeholder="Min 5, max 60 characters"
+              placeholder="Min 20, max 60 characters"
               value={form.name}
               onChange={handleChange}
               error={errors.name}
