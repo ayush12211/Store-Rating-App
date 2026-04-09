@@ -36,14 +36,24 @@ export default function SignupPage() {
       toast.success("Account created successfully!");
     } catch (err) {
       const serverErrors = err.response?.data?.errors;
-      if (serverErrors) {
+      if (Array.isArray(serverErrors) && serverErrors.length) {
         const mapped = {};
         serverErrors.forEach((e) => {
           mapped[e.path || e.param] = e.msg;
         });
         setErrors(mapped);
+        const firstError = serverErrors[0]?.msg;
+        if (firstError) toast.error(firstError);
+      } else if (!err.response) {
+        toast.error(
+          "Cannot reach server. Make sure backend and database are running.",
+        );
       } else {
-        toast.error(err.response?.data?.message || "Registration failed");
+        toast.error(
+          err.response?.data?.message ||
+            err.response?.data?.error ||
+            "Registration failed",
+        );
       }
     } finally {
       setLoading(false);
@@ -114,7 +124,7 @@ export default function SignupPage() {
             <Input
               label="Full Name"
               name="name"
-              placeholder="Min 20, max 60 characters"
+              placeholder="Min 5, max 60 characters"
               value={form.name}
               onChange={handleChange}
               error={errors.name}

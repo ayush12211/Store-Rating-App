@@ -16,8 +16,8 @@ router.post(
   "/signup",
   [
     body("name")
-      .isLength({ min: 20, max: 60 })
-      .withMessage("Name must be 20-60 characters"),
+      .isLength({ min: 5, max: 60 })
+      .withMessage("Name must be 5-60 characters"),
     body("email").isEmail().withMessage("Invalid email"),
     body("address")
       .isLength({ max: 400 })
@@ -36,6 +36,12 @@ router.post(
       return res.status(400).json({ errors: errors.array() });
 
     try {
+      if (!process.env.JWT_SECRET) {
+        return res
+          .status(500)
+          .json({ message: "Server misconfigured: JWT secret is missing." });
+      }
+
       const { name, email, address, password } = req.body;
       const existing = await User.findOne({ where: { email } });
       if (existing)
@@ -64,6 +70,11 @@ router.post(
           errors: err.errors.map((e) => ({ path: e.path, msg: e.message })),
         });
       }
+      if (err.name === "SequelizeConnectionError") {
+        return res
+          .status(503)
+          .json({ message: "Database unavailable. Please try again shortly." });
+      }
       res.status(500).json({ message: "Server error", error: err.message });
     }
   },
@@ -82,6 +93,12 @@ router.post(
       return res.status(400).json({ errors: errors.array() });
 
     try {
+      if (!process.env.JWT_SECRET) {
+        return res
+          .status(500)
+          .json({ message: "Server misconfigured: JWT secret is missing." });
+      }
+
       const { email, password } = req.body;
       const user = await User.findOne({ where: { email } });
       if (!user)

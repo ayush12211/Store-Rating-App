@@ -69,7 +69,7 @@ router.get('/users/:id', ...adminOnly, async (req, res) => {
 
 // POST /api/admin/users
 router.post('/users', ...adminOnly, [
-  body('name').isLength({ min: 20, max: 60 }).withMessage('Name must be 20-60 characters'),
+  body('name').isLength({ min: 5, max: 60 }).withMessage('Name must be 5-60 characters'),
   body('email').isEmail().withMessage('Invalid email'),
   body('address').isLength({ max: 400 }).withMessage('Address max 400 characters'),
   body('password')

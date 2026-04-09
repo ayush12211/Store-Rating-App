@@ -93,7 +93,7 @@ docker-compose up --build
 
 # 3. Open your browser
 # Frontend: http://localhost:3000
-# Backend API: http://localhost:5000/api/health
+# Backend API: http://localhost:5001/api/health
 ```
 
 A default admin account is auto-created on first run:
@@ -132,7 +132,7 @@ npm start
 npm run dev
 ```
 
-Backend runs on: `http://localhost:5000`
+Backend runs on: `http://localhost:5001`
 
 ### 3. Frontend Setup
 
@@ -148,14 +148,14 @@ npm start
 
 Frontend runs on: `http://localhost:3000`
 
-> The frontend proxies `/api/*` requests to `http://localhost:5000` via the `"proxy"` field in `package.json`.
+> The frontend proxies `/api/*` requests to `http://localhost:5001` via the `"proxy"` field in `package.json`.
 
 ---
 
 ## Environment Variables (backend/.env)
 
 ```env
-PORT=5000
+PORT=5001
 DB_HOST=localhost
 DB_PORT=5432
 DB_NAME=store_rating_db
