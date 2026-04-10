@@ -1,268 +1,230 @@
-# StoreRate — Full Stack Store Rating Platform
+# StoreRate
 
-A full-stack web application allowing users to submit ratings (1–5) for registered stores, with role-based access for Admins, Normal Users, and Store Owners.
+StoreRate is a full-stack store rating platform built for the FullStack Intern Coding Challenge. It supports three roles with a single login system:
+
+- `System Administrator`
+- `Normal User`
+- `Store Owner`
+
+Users can browse stores, submit ratings from `1` to `5`, and access role-specific dashboards after logging in.
 
 ## Tech Stack
 
-| Layer     | Technology                         |
-|-----------|------------------------------------|
-| Backend   | Node.js + Express.js               |
-| Database  | PostgreSQL + Sequelize ORM         |
-| Frontend  | React.js (CRA)                     |
-| Auth      | JWT (JSON Web Tokens) + bcryptjs   |
+| Layer | Technology |
+|---|---|
+| Frontend | React + Vite |
+| Backend | Node.js + Express.js |
+| Database | PostgreSQL + Sequelize |
+| Authentication | JWT + bcryptjs |
+| Deployment | Vercel + Render + Neon |
 
----
+## Live Access
 
-## Project Structure
+Add your deployed URLs here before submission:
 
-```
-store-rating-app/
-├── backend/
-│   ├── config/
-│   │   └── database.js          # Sequelize DB connection
-│   ├── middleware/
-│   │   └── auth.js              # JWT authenticate + authorize
-│   ├── models/
-│   │   ├── index.js             # Associations
-│   │   ├── User.js
-│   │   ├── Store.js
-│   │   └── Rating.js
-│   ├── routes/
-│   │   ├── auth.js              # /api/auth/*
-│   │   ├── admin.js             # /api/admin/*
-│   │   ├── stores.js            # /api/stores/*
-│   │   └── owner.js             # /api/owner/*
-│   ├── .env.example
-│   ├── Dockerfile
-│   ├── package.json
-│   └── server.js
-│
-├── frontend/
-│   ├── public/
-│   │   └── index.html
-│   ├── src/
-│   │   ├── api/
-│   │   │   └── index.js         # Axios API service layer
-│   │   ├── components/
-│   │   │   └── common/
-│   │   │       ├── index.js     # Button, Input, Table, Modal, Toast, etc.
-│   │   │       ├── Layout.js    # Sidebar + main layout
-│   │   │       └── ProtectedRoute.js
-│   │   ├── context/
-│   │   │   └── AuthContext.js   # Global auth state
-│   │   ├── pages/
-│   │   │   ├── LoginPage.js
-│   │   │   ├── SignupPage.js
-│   │   │   ├── SettingsPage.js  # Change password (User + Owner)
-│   │   │   ├── admin/
-│   │   │   │   ├── AdminDashboard.js
-│   │   │   │   ├── AdminUsers.js
-│   │   │   │   └── AdminStores.js
-│   │   │   ├── user/
-│   │   │   │   └── UserStores.js
-│   │   │   └── owner/
-│   │   │       └── OwnerDashboard.js
-│   │   ├── utils/
-│   │   │   └── validators.js    # Client-side form validation
-│   │   ├── App.js
-│   │   ├── index.js
-│   │   └── index.css
-│   ├── Dockerfile
-│   ├── nginx.conf
-│   └── package.json
-│
-├── docker-compose.yml
-└── README.md
-```
+- Frontend: `https://your-frontend-url`
+- Backend Health Check: `https://your-backend-url/api/health`
 
----
+## Recruiter Test Credentials
 
-## Quick Start (Docker — Recommended)
+Use the following admin credentials to test the application after deployment:
 
-### Prerequisites
-- [Docker](https://docs.docker.com/get-docker/) and Docker Compose installed
+- Admin Email: `admin@storerating.com`
+- Admin Password: `Admin@123`
 
-### Steps
+This admin account is auto-created by the backend on first run if no admin user exists in the database.
 
-```bash
-# 1. Clone / download the project
-cd store-rating-app
+## Implemented Functionality
 
-# 2. Start all services (PostgreSQL + Backend + Frontend)
-docker-compose up --build
+### System Administrator
 
-# 3. Open your browser
-# Frontend: http://localhost:3000
-# Backend API: http://localhost:5001/api/health
-```
+- Log in through the common login page
+- View dashboard statistics:
+  total users, total stores, total submitted ratings
+- Add new users with role selection:
+  `admin`, `user`, `store_owner`
+- Add new stores
+- View all users with filters and sorting
+- Filter users by `Name`, `Email`, `Address`, and `Role`
+- View user details
+- View all stores with filters and sorting
+- Log out
 
-A default admin account is auto-created on first run:
-- **Email:** `admin@storerating.com`
-- **Password:** `Admin@123`
+### Normal User
 
----
+- Sign up through the registration page
+- Log in through the common login page
+- Update password after login
+- View all registered stores
+- Search stores by `Name` and `Address`
+- See store name, address, overall rating, and own submitted rating
+- Submit a rating from `1` to `5`
+- Modify a previously submitted rating
+- Log out
 
-## Manual Setup (without Docker)
+### Store Owner
 
-### Prerequisites
-- Node.js v18+
-- PostgreSQL 14+ running locally
-
-### 1. Database Setup
-
-```sql
-CREATE DATABASE store_rating_db;
-```
-
-### 2. Backend Setup
-
-```bash
-cd backend
-
-# Copy and configure environment
-cp .env.example .env
-# Edit .env with your DB credentials and JWT secret
-
-# Install dependencies
-npm install
-
-# Start server (auto-syncs DB schema and seeds admin user)
-npm start
-# or for development with auto-reload:
-npm run dev
-```
-
-Backend runs on: `http://localhost:5001`
-
-### 3. Frontend Setup
-
-```bash
-cd frontend
-
-# Install dependencies
-npm install
-
-# Start development server
-npm start
-```
-
-Frontend runs on: `http://localhost:3000`
-
-> The frontend proxies `/api/*` requests to `http://localhost:5001` via the `"proxy"` field in `package.json`.
-
----
-
-## Environment Variables (backend/.env)
-
-```env
-PORT=5001
-DB_HOST=localhost
-DB_PORT=5432
-DB_NAME=store_rating_db
-DB_USER=postgres
-DB_PASSWORD=yourpassword
-JWT_SECRET=your_super_secret_jwt_key_here
-NODE_ENV=development
-```
-
----
-
-## API Endpoints
-
-### Auth — `/api/auth`
-| Method | Path            | Auth     | Description             |
-|--------|-----------------|----------|-------------------------|
-| POST   | `/signup`       | Public   | Register normal user    |
-| POST   | `/login`        | Public   | Login (all roles)       |
-| PUT    | `/password`     | Any user | Change own password     |
-| GET    | `/me`           | Any user | Get current user info   |
-
-### Admin — `/api/admin`
-| Method | Path            | Description                    |
-|--------|-----------------|--------------------------------|
-| GET    | `/dashboard`    | Stats: users, stores, ratings  |
-| GET    | `/users`        | List users (with filters/sort) |
-| GET    | `/users/:id`    | User detail (+ store rating)   |
-| POST   | `/users`        | Create user (any role)         |
-| GET    | `/stores`       | List stores (with filters/sort)|
-| POST   | `/stores`       | Create store                   |
-
-### Stores — `/api/stores`
-| Method | Path                  | Auth  | Description                    |
-|--------|-----------------------|-------|--------------------------------|
-| GET    | `/`                   | Any   | All stores with user's rating  |
-| POST   | `/:id/ratings`        | User  | Submit rating                  |
-| PUT    | `/:id/ratings`        | User  | Modify existing rating         |
-
-### Owner — `/api/owner`
-| Method | Path         | Auth        | Description                       |
-|--------|--------------|-------------|-----------------------------------|
-| GET    | `/dashboard` | store_owner | Store info + who rated + avg      |
-
----
-
-## User Roles & Features
-
-### 🔴 System Administrator
-- Dashboard with total users / stores / ratings
-- Add users (admin, normal, store owner) and stores
-- View & filter all users and stores by Name, Email, Address, Role
-- View user detail including store owner's rating
-
-### 🔵 Normal User
-- Self-registration and login
-- Browse all stores, search by name/address
-- Submit ratings (1–5 stars)
-- Modify previously submitted ratings
-- Change password
-
-### 🟢 Store Owner
-- Login (account created by admin)
-- Dashboard: see average rating + list of users who rated
-- Rating distribution chart
-- Change password
-
----
+- Log in through the common login page
+- Update password after login
+- View store dashboard
+- See average store rating
+- See the list of users who submitted ratings
+- See rating distribution
+- Log out
 
 ## Form Validation Rules
 
-| Field    | Rule                                                      |
-|----------|-----------------------------------------------------------|
-| Name     | Min 20 chars, Max 60 chars                                |
-| Address  | Max 400 chars                                             |
-| Password | 8–16 chars, ≥1 uppercase letter, ≥1 special character    |
-| Email    | Standard email format                                     |
+The application follows the challenge validation requirements:
 
-Validation is enforced on **both** client-side (React) and server-side (express-validator).
+- Name: `20` to `60` characters
+- Address: maximum `400` characters
+- Password: `8` to `16` characters, at least one uppercase letter, at least one special character
+- Email: standard email validation
 
----
+Validation is enforced on both frontend and backend.
 
-## Database Schema
+## API Overview
 
+### Auth
+
+- `POST /api/auth/signup`
+- `POST /api/auth/login`
+- `PUT /api/auth/password`
+- `GET /api/auth/me`
+
+### Admin
+
+- `GET /api/admin/dashboard`
+- `GET /api/admin/users`
+- `GET /api/admin/users/:id`
+- `POST /api/admin/users`
+- `GET /api/admin/stores`
+- `POST /api/admin/stores`
+
+### Stores
+
+- `GET /api/stores`
+- `POST /api/stores/:id/ratings`
+- `PUT /api/stores/:id/ratings`
+
+### Store Owner
+
+- `GET /api/owner/dashboard`
+
+## Local Setup
+
+### Backend
+
+1. Go to the backend folder.
+2. Copy the example environment file.
+3. Install dependencies.
+4. Start the server.
+
+```bash
+cd backend
+cp .env.example .env
+npm install
+npm start
 ```
-users
-  id, name, email, password (hashed), address, role (admin|user|store_owner),
-  createdAt, updatedAt
 
-stores
-  id, name, email, address, ownerId (FK → users.id),
-  createdAt, updatedAt
+### Frontend
 
-ratings
-  id, userId (FK → users.id), storeId (FK → stores.id),
-  rating (1–5), createdAt, updatedAt
-  UNIQUE(userId, storeId)
+1. Go to the frontend folder.
+2. Install dependencies.
+3. Start the Vite dev server.
+
+```bash
+cd frontend
+npm install
+npm run dev
 ```
 
----
+## Environment Variables
 
-## Design Decisions & Best Practices
+### Backend
 
-- **Passwords** are hashed with bcryptjs (salt rounds: 12) via Sequelize model hooks
-- **JWT tokens** expire in 7 days; stored in localStorage on client
-- **Role-based access** enforced at both route middleware (backend) and ProtectedRoute (frontend)
-- **Sequelize `alter: true`** auto-syncs schema on startup without data loss
-- **Unique constraint** on `(userId, storeId)` prevents duplicate ratings
-- **Soft validation** on all listing queries — all filters are optional, invalid sort fields are sanitized
-- Tables support **ascending/descending sort** on all key fields
-- **CORS** enabled for development; tighten origins in production
+For Render + Neon deployment, using `DATABASE_URL` is the simplest option.
+
+```env
+PORT=5000
+DATABASE_URL=
+DB_HOST=
+DB_PORT=5432
+DB_NAME=
+DB_USER=
+DB_PASSWORD=
+DB_SSL=true
+JWT_SECRET=your_super_secret_jwt_key_here
+NODE_ENV=production
+```
+
+### Frontend
+
+```env
+VITE_API_URL=https://your-render-backend-url/api
+```
+
+## Deployment
+
+This project is prepared for:
+
+- `Neon` for PostgreSQL
+- `Render` for the backend
+- `Vercel` for the frontend
+
+### Backend Deployment on Render
+
+- Root Directory: `backend`
+- Build Command: `npm install`
+- Start Command: `npm start`
+
+### Frontend Deployment on Vercel
+
+- Framework: `Vite`
+- Root Directory: `frontend`
+- Build Command: `npm run build`
+- Output Directory: `dist`
+
+## Database Design
+
+### users
+
+- `id`
+- `name`
+- `email`
+- `password`
+- `address`
+- `role`
+- `createdAt`
+- `updatedAt`
+
+### stores
+
+- `id`
+- `name`
+- `email`
+- `address`
+- `ownerId`
+- `createdAt`
+- `updatedAt`
+
+### ratings
+
+- `id`
+- `userId`
+- `storeId`
+- `rating`
+- `createdAt`
+- `updatedAt`
+
+Constraint:
+
+- One user can rate one store only once
+
+## Notes
+
+- Passwords are hashed before storing in the database
+- JWT-based authentication is used for protected routes
+- Role-based access is enforced in both backend and frontend
+- Sorting is supported in listing views for key fields
+- The backend seeds the default admin account automatically if it does not exist
