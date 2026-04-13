@@ -5,6 +5,11 @@
 - Email: `admin@storerating.com`
 - Password: `Admin@123`
 
+## User Credentials
+
+- Email: `ayush@gmail.com`
+- Password: `Ayush@123`
+
 ## Steps to Check the Project
 
 1. Open the frontend URL.
